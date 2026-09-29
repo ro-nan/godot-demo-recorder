@@ -59,16 +59,16 @@ shadow_enabled = true
 [node name="Enivroment" type="WorldEnvironment" parent="." unique_id=282383233]
 environment = SubResource("Environment_4mccc")
 
-[node name="Basic FPS Player" type="CharacterBody3D" parent="." unique_id=746268698]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-script = ExtResource("1_fpauf")
-
-[node name="Head" parent="Basic FPS Player" unique_id=1043894326 instance=ExtResource("2_uri1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Basic FPS Player" unique_id=1881204156]
-shape = SubResource("CapsuleShape3D_li7ud")
-
 [node name="SceneRecorder" type="SceneRecorder" parent="." unique_id=1555777188]
 
 [node name="Node3D" type="Node3D" parent="SceneRecorder" unique_id=222177772]
+
+[node name="Basic FPS Player" type="CharacterBody3D" parent="SceneRecorder" unique_id=746268698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+script = ExtResource("1_fpauf")
+
+[node name="Head" parent="SceneRecorder/Basic FPS Player" unique_id=1043894326 instance=ExtResource("2_uri1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneRecorder/Basic FPS Player" unique_id=1881204156]
+shape = SubResource("CapsuleShape3D_li7ud")

@@ -1,13 +1,13 @@
 #ifndef SCENERECORDER_H
 #define SCENERECORDER_H
 
-#include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/node3d.hpp>
 #include "main.pb.h"
 
 namespace godot {
 
-class SceneRecorder : public Node {
-    GDCLASS(SceneRecorder, Node)
+class SceneRecorder : public Node3D {
+    GDCLASS(SceneRecorder, Node3D)
 
 protected:
     static void _bind_methods();
@@ -23,6 +23,8 @@ private:
     godot::String* ptr_filename;
 
     demo::Recording rec;
+
+    void save_recording();
 };
 
 }  // namespace godot

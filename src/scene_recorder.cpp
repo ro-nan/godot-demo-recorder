@@ -18,27 +18,13 @@ SceneRecorder::~SceneRecorder() {
 }
 
 void SceneRecorder::_ready() {
-   GOOGLE_PROTOBUF_VERIFY_VERSION;
-   auto* frame = rec.add_frames();
-   auto* node = frame->add_nodes();
-   node->set_x(1.0);
-   node->set_y(2.0);
-   node->set_z(3.0);
-
-   Ref<FileAccess> f = FileAccess::open("rec.bin", FileAccess::WRITE);
-   if (f.is_null()) {
-		return;
-	}
-    auto data = rec.SerializeAsString();
-    f->store_buffer((const uint8_t*)data.data(), data.size());
-    f->flush();
-    f->close();
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     demo::Recording replay;
     PackedByteArray rdata = FileAccess::get_file_as_bytes("rec.bin");
     std::string serialized;
     if (!rdata.is_empty()) {
-        serialized.assign(reinterpret_cast<const char *>(rdata.ptr()), rdata.size());
+        serialized.assign(reinterpret_cast<const char*>(rdata.ptr()), rdata.size());
     }
     if (replay.ParseFromString(serialized)) {
         print_line("LOADED");
@@ -55,6 +41,29 @@ void SceneRecorder::_ready() {
 }
 
 void SceneRecorder::_process(double delta) {
-   
-    
+    auto* frame = rec.add_frames();
+    for(int i = 0; i < get_child_count(); i++) {
+        auto child = Object::cast_to<Node3D>(get_child(i));
+        if (child->is_class("Node3D")) {
+            auto* node = frame->add_nodes();
+            auto position = child->get_position();
+            node->set_x(position.x);
+            node->set_y(position.y);
+            node->set_z(position.z);
+
+            print_line(node->x());
+        }
+    }
+    save_recording();
+}
+
+void SceneRecorder::save_recording() {
+    Ref<FileAccess> f = FileAccess::open("rec.bin", FileAccess::WRITE);
+    if (f.is_null()) {
+        return;
+    }
+    auto data = rec.SerializeAsString();
+    f->store_buffer((const uint8_t*)data.data(), data.size());
+    f->flush();
+    f->close();
 }
