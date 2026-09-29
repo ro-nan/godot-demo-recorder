@@ -19,25 +19,6 @@ SceneRecorder::~SceneRecorder() {
 
 void SceneRecorder::_ready() {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-    demo::Recording replay;
-    PackedByteArray rdata = FileAccess::get_file_as_bytes("rec.bin");
-    std::string serialized;
-    if (!rdata.is_empty()) {
-        serialized.assign(reinterpret_cast<const char*>(rdata.ptr()), rdata.size());
-    }
-    if (replay.ParseFromString(serialized)) {
-        print_line("LOADED");
-    } else {
-        print_line("FAILED TO LOAD");
-    }
-    print_line("Replay has " + String::num(replay.frames_size()) + " frames");
-    if (replay.frames_size() > 0 && replay.frames(0).nodes_size() > 0) {
-        const auto& node = replay.frames(0).nodes(0);
-        print_line(node.x());
-        print_line(node.y());
-        print_line(node.z());
-    }
 }
 
 void SceneRecorder::_process(double delta) {

@@ -38,6 +38,7 @@ ambient_light_source = 3
 shape = SubResource("BoxShape3D_caja7")
 
 [node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=1188998088]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0037157536, -1.1920929e-07, -0.0075018406)
 mesh = SubResource("PlaneMesh_6b5j0")
 
 [node name="Cube" type="MeshInstance3D" parent="." unique_id=1140341536]
@@ -59,16 +60,20 @@ shadow_enabled = true
 [node name="Enivroment" type="WorldEnvironment" parent="." unique_id=282383233]
 environment = SubResource("Environment_4mccc")
 
-[node name="SceneRecorder" type="SceneRecorder" parent="." unique_id=1555777188]
+[node name="SceneReplayer" type="SceneReplayer" parent="." unique_id=2037083916]
 
-[node name="Node3D" type="Node3D" parent="SceneRecorder" unique_id=222177772]
+[node name="Node3D" type="Node3D" parent="SceneReplayer" unique_id=1647267554]
 
-[node name="Basic FPS Player" type="CharacterBody3D" parent="SceneRecorder" unique_id=746268698]
+[node name="Basic FPS Player" type="CharacterBody3D" parent="SceneReplayer" unique_id=1482753843]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 script = ExtResource("1_fpauf")
 
-[node name="Head" parent="SceneRecorder/Basic FPS Player" unique_id=1043894326 instance=ExtResource("2_uri1i")]
+[node name="Head" parent="SceneReplayer/Basic FPS Player" unique_id=1900583171 instance=ExtResource("2_uri1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneRecorder/Basic FPS Player" unique_id=1881204156]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneReplayer/Basic FPS Player" unique_id=14701619]
 shape = SubResource("CapsuleShape3D_li7ud")
+
+[node name="_Node3D_20834" parent="SceneReplayer/Basic FPS Player" unique_id=967683733 instance=ExtResource("2_uri1i")]
+
+[node name="@Node3D@21430" type="Node3D" parent="SceneReplayer/Basic FPS Player" unique_id=522303380 instance=ExtResource("2_uri1i")]
