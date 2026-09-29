@@ -4,7 +4,8 @@ env = SConscript("godot-cpp/SConstruct", {"api_version": "4.6"})
 
 # Adjust this if your source files live in a different folder.
 env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+env.Append(LIBS=["protobuf"])
+sources = Glob("src/*.cpp") + Glob("src/*.cc", strings=True)
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(

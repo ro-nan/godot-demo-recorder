@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package demo;
+
+message Recording {
+  message Frame {
+    float time = 1;
+    message Node3D {
+        float x = 1;
+        float y = 2;
+        float z = 3;
+
+        float rx = 4;
+        float ry = 5;
+        float rz = 6;
+
+        float sx = 7;
+        float sy = 8;
+        float sz = 9;
+
+        bool visible = 10;
+    }
+    repeated Node3D nodes = 2;
+  }
+  repeated Frame frames = 1;
+}
