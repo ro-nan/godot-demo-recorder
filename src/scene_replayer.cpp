@@ -54,6 +54,8 @@ void SceneReplayer::_process(double delta) {
         Node* child_node = get_child(i);
         auto child = Object::cast_to<Node3D>(child_node);
         child->set_position(Vector3(node.x(), node.y(), node.z()));
+        child->set_rotation(Vector3(node.rx(), node.ry(), node.rz()));
+        child->set_scale(Vector3(node.sx(), node.sy(), node.sz()));
     }
 
     frame++;

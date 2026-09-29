@@ -2,6 +2,7 @@
 
 #include "scene_recorder.h"
 #include "scene_replayer.h"
+#include "recorded_scene.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -16,6 +17,7 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 
     GDREGISTER_RUNTIME_CLASS(SceneRecorder);
     GDREGISTER_RUNTIME_CLASS(SceneReplayer);
+    GDREGISTER_RUNTIME_CLASS(RecordedScene);
 }
 
 void uninitialize_example_module(ModuleInitializationLevel p_level) {

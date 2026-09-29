@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://vupfism0y8ub"]
 
+[ext_resource type="Script" uid="uid://c5cj22osck0xx" path="res://main.gd" id="1_1juj6"]
 [ext_resource type="Script" uid="uid://by4c7vpqujm2m" path="res://addons/Basic FPS Player/Src/basic_player_startup.gd" id="1_fpauf"]
 [ext_resource type="PackedScene" uid="uid://kmyakts4l64t" path="res://addons/Basic FPS Player/Src/basic_player_head.tscn" id="2_uri1i"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_li7ud"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_caja7"]
 size = Vector3(50, 0, 50)
@@ -28,9 +31,24 @@ sky_material = SubResource("PanoramaSkyMaterial_msuu0")
 sky = SubResource("Sky_4ggmq")
 ambient_light_source = 3
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_li7ud"]
+[node name="main" type="RecordedScene" unique_id=1413436217]
+script = ExtResource("1_1juj6")
 
-[node name="main" type="Node3D" unique_id=215484797]
+[node name="Node3D" type="Node3D" parent="." unique_id=1647267554]
+
+[node name="Basic FPS Player" type="CharacterBody3D" parent="." unique_id=1482753843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+script = ExtResource("1_fpauf")
+
+[node name="Head" parent="Basic FPS Player" unique_id=1900583171 instance=ExtResource("2_uri1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Basic FPS Player" unique_id=14701619]
+shape = SubResource("CapsuleShape3D_li7ud")
+
+[node name="_Node3D_20834" parent="Basic FPS Player" unique_id=967683733 instance=ExtResource("2_uri1i")]
+
+[node name="@Node3D@21430" parent="Basic FPS Player" unique_id=522303380 instance=ExtResource("2_uri1i")]
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=372930931]
 
@@ -59,21 +77,3 @@ shadow_enabled = true
 
 [node name="Enivroment" type="WorldEnvironment" parent="." unique_id=282383233]
 environment = SubResource("Environment_4mccc")
-
-[node name="SceneReplayer" type="SceneReplayer" parent="." unique_id=2037083916]
-
-[node name="Node3D" type="Node3D" parent="SceneReplayer" unique_id=1647267554]
-
-[node name="Basic FPS Player" type="CharacterBody3D" parent="SceneReplayer" unique_id=1482753843]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-script = ExtResource("1_fpauf")
-
-[node name="Head" parent="SceneReplayer/Basic FPS Player" unique_id=1900583171 instance=ExtResource("2_uri1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneReplayer/Basic FPS Player" unique_id=14701619]
-shape = SubResource("CapsuleShape3D_li7ud")
-
-[node name="_Node3D_20834" parent="SceneReplayer/Basic FPS Player" unique_id=967683733 instance=ExtResource("2_uri1i")]
-
-[node name="@Node3D@21430" type="Node3D" parent="SceneReplayer/Basic FPS Player" unique_id=522303380 instance=ExtResource("2_uri1i")]
