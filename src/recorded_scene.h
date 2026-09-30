@@ -3,6 +3,8 @@
 
 #include <godot_cpp/classes/node3d.hpp>
 #include "main.pb.h"
+#include <string>
+#include <unordered_map>
 
 namespace godot {
 
@@ -33,13 +35,13 @@ private:
 	String filename = "rec.bin";
 	demo::Recording recording_data;
 	demo::Recording replay_data;
-    demo::Recording_Frame *frame;
+	demo::Recording_Frame *frame = nullptr;
+	std::unordered_map<std::string, demo::Recording_Frame_Node3D> previous_nodes;
 
 	void apply_mode();
 	void load_replay();
 	void capture_frame(godot::Node3D* parent);
 	void replay_frame();
-	void restore_tree_pause();
 	void save_recording();
 };
 

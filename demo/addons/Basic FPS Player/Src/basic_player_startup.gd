@@ -78,10 +78,12 @@ func _ready():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	head_start_pos = $Head.position
-
+	
+@onready var hello: RecordedScene = $".."
 func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
+	if !hello.is_recording:	return
 	
 	# Increment player tick, used in head bob motion
 	tick += 1
