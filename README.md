@@ -12,10 +12,10 @@ This addon seeks to solve this issue by recording gameplay sessions, uploading t
 - Debugging
 
 ## Usage 
-Set recording mode using `RecordedScene.set_recording` and check if the scene is recording using `RecordedScene.is_recording`.
+Set recording mode using `RecordedScene.set_recording(bool)` and check if the scene is recording using `RecordedScene.is_recording()`.
 
 
-Make sure to disable scripts that may interfere with replaying by returning during their process when `RecordedScene.is_recording`. Eg.
+Make sure to disable scripts that may interfere with replaying by returning during their process when `RecordedScene.is_recording()`. Eg.
 
 Instead of
 ```
@@ -25,7 +25,7 @@ func _physics_process(delta):
 Do
 ```
 func _physics_process(delta):
-    if RecordedScene.is_recording: return # RecordedScene being the recorded scene root node
+    if RecordedScene.is_recording(): return # RecordedScene being the recorded scene root node
     global_rotation = Vector3.ZERO # On some frames this will lead to framefighting
 
 ```

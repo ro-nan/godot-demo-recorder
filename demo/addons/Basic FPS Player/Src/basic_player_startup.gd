@@ -83,7 +83,7 @@ func _ready():
 func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
-	if !hello.is_recording:	return
+	if !hello.is_recording():	return
 	
 	# Increment player tick, used in head bob motion
 	tick += 1
