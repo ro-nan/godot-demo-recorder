@@ -33,10 +33,11 @@ private:
 	String filename = "rec.bin";
 	demo::Recording recording_data;
 	demo::Recording replay_data;
+    demo::Recording_Frame *frame;
 
 	void apply_mode();
 	void load_replay();
-	void capture_frame();
+	void capture_frame(godot::Node3D* parent);
 	void replay_frame();
 	void restore_tree_pause();
 	void save_recording();

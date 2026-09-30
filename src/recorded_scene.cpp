@@ -94,26 +94,26 @@ void RecordedScene::restore_tree_pause() {
 
 void RecordedScene::_process(double delta) {
 	if (recording) {
-		capture_frame();
+        frame = recording_data.add_frames();
+		capture_frame(Object::cast_to<Node3D>(get_child(0)->get_parent()));
+        save_recording();
 		return;
 	}
 
 	replay_frame();
 }
 
-void RecordedScene::capture_frame() {
-    // TODO: Make this record all children children as well
-    // The plan: make it recursively record nodes and have the node storage record the node path so you can just iterate thru all objects and get them via node path, then only record those whose values changed. 
-	demo::Recording_Frame *frame = recording_data.add_frames();
-	for (int i = 0; i < get_child_count(); i++) {
-		Node3D *child = Object::cast_to<Node3D>(get_child(i));
+void RecordedScene::capture_frame(godot::Node3D* parent) {
+	for (int i = 0; i < parent->get_child_count(); i++) {
+		Node3D *child = Object::cast_to<Node3D>(parent->get_child(i));
 		if (!child) {
 			continue;
 		}
 
-		const Vector3 position = child->get_position();
-        const Vector3 rotation = child->get_rotation();
+        const Vector3 position = child->get_global_position();
+        const Vector3 rotation = child->get_global_rotation();
         const Vector3 scale = child->get_scale();
+		
 		demo::Recording_Frame_Node3D *node = frame->add_nodes();
         auto path = std::string(String(child->get_path().get_concatenated_names()).utf8().get_data()); // NOTE: Maybe make global for this if I keep having to use it? Not sure.
         node->set_path(path);
@@ -126,8 +126,9 @@ void RecordedScene::capture_frame() {
         node->set_sx(scale.x);
         node->set_sy(scale.y);
         node->set_sz(scale.z);
+
+        capture_frame(child);
 	}
-	save_recording();
 }
 
 void RecordedScene::replay_frame() {
@@ -148,8 +149,8 @@ void RecordedScene::replay_frame() {
 			continue;
 		}
         
-		child->set_position(Vector3(node.x(), node.y(), node.z()));
-        child->set_rotation(Vector3(node.rx(), node.ry(), node.rz()));
+		child->set_global_position(Vector3(node.x(), node.y(), node.z()));
+        child->set_global_rotation(Vector3(node.rx(), node.ry(), node.rz()));
         child->set_scale(Vector3(node.sx(), node.sy(), node.sz()));
 	}
 }
