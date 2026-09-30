@@ -6,6 +6,8 @@ message Recording {
   message Frame {
     float time = 1;
     message Node3D {
+        string path = 11;
+
         float x = 1;
         float y = 2;
         float z = 3;

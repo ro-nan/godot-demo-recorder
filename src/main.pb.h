@@ -185,6 +185,7 @@ class Recording_Frame_Node3D final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kPathFieldNumber = 11,
     kXFieldNumber = 1,
     kYFieldNumber = 2,
     kZFieldNumber = 3,
@@ -196,6 +197,20 @@ class Recording_Frame_Node3D final :
     kSzFieldNumber = 9,
     kVisibleFieldNumber = 10,
   };
+  // string path = 11;
+  void clear_path();
+  const std::string& path() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_path(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_path();
+  PROTOBUF_NODISCARD std::string* release_path();
+  void set_allocated_path(std::string* path);
+  private:
+  const std::string& _internal_path() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_path(const std::string& value);
+  std::string* _internal_mutable_path();
+  public:
+
   // float x = 1;
   void clear_x();
   float x() const;
@@ -294,6 +309,7 @@ class Recording_Frame_Node3D final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr path_;
     float x_;
     float y_;
     float z_;
@@ -648,6 +664,56 @@ class Recording final :
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
 // Recording_Frame_Node3D
+
+// string path = 11;
+inline void Recording_Frame_Node3D::clear_path() {
+  _impl_.path_.ClearToEmpty();
+}
+inline const std::string& Recording_Frame_Node3D::path() const {
+  // @@protoc_insertion_point(field_get:demo.Recording.Frame.Node3D.path)
+  return _internal_path();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Recording_Frame_Node3D::set_path(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.path_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:demo.Recording.Frame.Node3D.path)
+}
+inline std::string* Recording_Frame_Node3D::mutable_path() {
+  std::string* _s = _internal_mutable_path();
+  // @@protoc_insertion_point(field_mutable:demo.Recording.Frame.Node3D.path)
+  return _s;
+}
+inline const std::string& Recording_Frame_Node3D::_internal_path() const {
+  return _impl_.path_.Get();
+}
+inline void Recording_Frame_Node3D::_internal_set_path(const std::string& value) {
+  
+  _impl_.path_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Recording_Frame_Node3D::_internal_mutable_path() {
+  
+  return _impl_.path_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Recording_Frame_Node3D::release_path() {
+  // @@protoc_insertion_point(field_release:demo.Recording.Frame.Node3D.path)
+  return _impl_.path_.Release();
+}
+inline void Recording_Frame_Node3D::set_allocated_path(std::string* path) {
+  if (path != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.path_.SetAllocated(path, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.path_.IsDefault()) {
+    _impl_.path_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:demo.Recording.Frame.Node3D.path)
+}
 
 // float x = 1;
 inline void Recording_Frame_Node3D::clear_x() {

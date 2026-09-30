@@ -23,7 +23,8 @@ namespace _pbi = _pb::internal;
 namespace demo {
 PROTOBUF_CONSTEXPR Recording_Frame_Node3D::Recording_Frame_Node3D(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.x_)*/0
+    /*decltype(_impl_.path_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.x_)*/0
   , /*decltype(_impl_.y_)*/0
   , /*decltype(_impl_.z_)*/0
   , /*decltype(_impl_.rx_)*/0
@@ -82,6 +83,7 @@ const uint32_t TableStruct_main_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(pro
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::demo::Recording_Frame_Node3D, _impl_.path_),
   PROTOBUF_FIELD_OFFSET(::demo::Recording_Frame_Node3D, _impl_.x_),
   PROTOBUF_FIELD_OFFSET(::demo::Recording_Frame_Node3D, _impl_.y_),
   PROTOBUF_FIELD_OFFSET(::demo::Recording_Frame_Node3D, _impl_.z_),
@@ -110,8 +112,8 @@ const uint32_t TableStruct_main_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(pro
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::demo::Recording_Frame_Node3D)},
-  { 16, -1, -1, sizeof(::demo::Recording_Frame)},
-  { 24, -1, -1, sizeof(::demo::Recording)},
+  { 17, -1, -1, sizeof(::demo::Recording_Frame)},
+  { 25, -1, -1, sizeof(::demo::Recording)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -121,18 +123,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_main_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nmain.proto\022\004demo\"\374\001\n\tRecording\022%\n\006fram"
-  "es\030\001 \003(\0132\025.demo.Recording.Frame\032\307\001\n\005Fram"
+  "\n\nmain.proto\022\004demo\"\212\002\n\tRecording\022%\n\006fram"
+  "es\030\001 \003(\0132\025.demo.Recording.Frame\032\325\001\n\005Fram"
   "e\022\014\n\004time\030\001 \001(\002\022+\n\005nodes\030\002 \003(\0132\034.demo.Re"
-  "cording.Frame.Node3D\032\202\001\n\006Node3D\022\t\n\001x\030\001 \001"
-  "(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\022\n\n\002rx\030\004 \001(\002\022\n\n\002"
-  "ry\030\005 \001(\002\022\n\n\002rz\030\006 \001(\002\022\n\n\002sx\030\007 \001(\002\022\n\n\002sy\030\010"
-  " \001(\002\022\n\n\002sz\030\t \001(\002\022\017\n\007visible\030\n \001(\010b\006proto"
-  "3"
+  "cording.Frame.Node3D\032\220\001\n\006Node3D\022\014\n\004path\030"
+  "\013 \001(\t\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\022\n"
+  "\n\002rx\030\004 \001(\002\022\n\n\002ry\030\005 \001(\002\022\n\n\002rz\030\006 \001(\002\022\n\n\002sx"
+  "\030\007 \001(\002\022\n\n\002sy\030\010 \001(\002\022\n\n\002sz\030\t \001(\002\022\017\n\007visibl"
+  "e\030\n \001(\010b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_main_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_main_2eproto = {
-    false, false, 281, descriptor_table_protodef_main_2eproto,
+    false, false, 295, descriptor_table_protodef_main_2eproto,
     "main.proto",
     &descriptor_table_main_2eproto_once, nullptr, 0, 3,
     schemas, file_default_instances, TableStruct_main_2eproto::offsets,
@@ -163,7 +165,8 @@ Recording_Frame_Node3D::Recording_Frame_Node3D(const Recording_Frame_Node3D& fro
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   Recording_Frame_Node3D* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.x_){}
+      decltype(_impl_.path_){}
+    , decltype(_impl_.x_){}
     , decltype(_impl_.y_){}
     , decltype(_impl_.z_){}
     , decltype(_impl_.rx_){}
@@ -176,6 +179,14 @@ Recording_Frame_Node3D::Recording_Frame_Node3D(const Recording_Frame_Node3D& fro
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.path_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.path_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_path().empty()) {
+    _this->_impl_.path_.Set(from._internal_path(), 
+      _this->GetArenaForAllocation());
+  }
   ::memcpy(&_impl_.x_, &from._impl_.x_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.visible_) -
     reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.visible_));
@@ -187,7 +198,8 @@ inline void Recording_Frame_Node3D::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.x_){0}
+      decltype(_impl_.path_){}
+    , decltype(_impl_.x_){0}
     , decltype(_impl_.y_){0}
     , decltype(_impl_.z_){0}
     , decltype(_impl_.rx_){0}
@@ -199,6 +211,10 @@ inline void Recording_Frame_Node3D::SharedCtor(
     , decltype(_impl_.visible_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
+  _impl_.path_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.path_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 Recording_Frame_Node3D::~Recording_Frame_Node3D() {
@@ -212,6 +228,7 @@ Recording_Frame_Node3D::~Recording_Frame_Node3D() {
 
 inline void Recording_Frame_Node3D::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.path_.Destroy();
 }
 
 void Recording_Frame_Node3D::SetCachedSize(int size) const {
@@ -224,6 +241,7 @@ void Recording_Frame_Node3D::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.path_.ClearToEmpty();
   ::memset(&_impl_.x_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.visible_) -
       reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.visible_));
@@ -313,6 +331,16 @@ const char* Recording_Frame_Node3D::_InternalParse(const char* ptr, ::_pbi::Pars
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
           _impl_.visible_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string path = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
+          auto str = _internal_mutable_path();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "demo.Recording.Frame.Node3D.path"));
         } else
           goto handle_unusual;
         continue;
@@ -441,6 +469,16 @@ uint8_t* Recording_Frame_Node3D::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteBoolToArray(10, this->_internal_visible(), target);
   }
 
+  // string path = 11;
+  if (!this->_internal_path().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_path().data(), static_cast<int>(this->_internal_path().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "demo.Recording.Frame.Node3D.path");
+    target = stream->WriteStringMaybeAliased(
+        11, this->_internal_path(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -456,6 +494,13 @@ size_t Recording_Frame_Node3D::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string path = 11;
+  if (!this->_internal_path().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_path());
+  }
 
   // float x = 1;
   static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
@@ -561,6 +606,9 @@ void Recording_Frame_Node3D::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (!from._internal_path().empty()) {
+    _this->_internal_set_path(from._internal_path());
+  }
   static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
   float tmp_x = from._internal_x();
   uint32_t raw_x;
@@ -643,7 +691,13 @@ bool Recording_Frame_Node3D::IsInitialized() const {
 
 void Recording_Frame_Node3D::InternalSwap(Recording_Frame_Node3D* other) {
   using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.path_, lhs_arena,
+      &other->_impl_.path_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Recording_Frame_Node3D, _impl_.visible_)
       + sizeof(Recording_Frame_Node3D::_impl_.visible_)

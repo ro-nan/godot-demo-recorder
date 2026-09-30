@@ -3,6 +3,7 @@
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <string>
 
 using namespace godot;
 
@@ -101,6 +102,8 @@ void RecordedScene::_process(double delta) {
 }
 
 void RecordedScene::capture_frame() {
+    // TODO: Make this record all children children as well
+    // The plan: make it recursively record nodes and have the node storage record the node path so you can just iterate thru all objects and get them via node path, then only record those whose values changed. 
 	demo::Recording_Frame *frame = recording_data.add_frames();
 	for (int i = 0; i < get_child_count(); i++) {
 		Node3D *child = Object::cast_to<Node3D>(get_child(i));
@@ -112,6 +115,8 @@ void RecordedScene::capture_frame() {
         const Vector3 rotation = child->get_rotation();
         const Vector3 scale = child->get_scale();
 		demo::Recording_Frame_Node3D *node = frame->add_nodes();
+        auto path = std::string(String(child->get_path().get_concatenated_names()).utf8().get_data()); // NOTE: Maybe make global for this if I keep having to use it? Not sure.
+        node->set_path(path);
 		node->set_x(position.x);
 		node->set_y(position.y);
 		node->set_z(position.z);
@@ -137,8 +142,11 @@ void RecordedScene::replay_frame() {
 		if (!child) {
 			continue;
 		}
-
+        
+        
 		const demo::Recording_Frame_Node3D &node = frame.nodes(node_index++);
+        auto path = String(node.path().c_str());
+        print_line(String("path: ") + path);
 		child->set_position(Vector3(node.x(), node.y(), node.z()));
         child->set_rotation(Vector3(node.rx(), node.ry(), node.rz()));
         child->set_scale(Vector3(node.sx(), node.sy(), node.sz()));
