@@ -31,7 +31,7 @@ sky_material = SubResource("PanoramaSkyMaterial_msuu0")
 sky = SubResource("Sky_4ggmq")
 ambient_light_source = 3
 
-[node name="main" type="RecordedScene" unique_id=1413436217]
+[node name="hello" type="RecordedScene" unique_id=1413436217]
 script = ExtResource("1_1juj6")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1647267554]

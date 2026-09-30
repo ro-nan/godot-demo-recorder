@@ -137,16 +137,17 @@ void RecordedScene::replay_frame() {
 
 	const demo::Recording_Frame &frame = replay_data.frames(replay_frame_index++);
 	int node_index = 0;
-	for (int i = 0; i < get_child_count() && node_index < frame.nodes_size(); i++) {
-		Node3D *child = Object::cast_to<Node3D>(get_child(i));
-		if (!child) {
+	for (int i = 0; i < frame.nodes_size() && node_index < frame.nodes_size(); i++) {
+		const demo::Recording_Frame_Node3D &node = frame.nodes(node_index++);
+
+        auto decoded_path = node.path();
+        std::string selfname = String(get_name()).utf8().get_data();
+        NodePath path(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str()); // Get the nodepath relative to this node which is the second half of the nodepath after this nodes name and a / (eg. "root/self/that" -> "that")
+        Node3D *child = Object::cast_to<Node3D>(get_node<Node>(path));
+        if (!child) {
 			continue;
 		}
         
-        
-		const demo::Recording_Frame_Node3D &node = frame.nodes(node_index++);
-        auto path = String(node.path().c_str());
-        print_line(String("path: ") + path);
 		child->set_position(Vector3(node.x(), node.y(), node.z()));
         child->set_rotation(Vector3(node.rx(), node.ry(), node.rz()));
         child->set_scale(Vector3(node.sx(), node.sy(), node.sz()));

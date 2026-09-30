@@ -36,7 +36,8 @@ void SceneReplayer::_ready() {
     print_line("Replay has " + String::num(replay.frames_size()) + " frames");
     if (replay.frames_size() > 0 && replay.frames(0).nodes_size() > 0) {
         const auto& node = replay.frames(0).nodes(0);
-        print_line(node.path())        print_line(node.x());
+        print_line(String(node.path().c_str()));  
+        print_line(node.x());
         print_line(node.y());
         print_line(node.z());
     }
