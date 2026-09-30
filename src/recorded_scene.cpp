@@ -49,7 +49,7 @@ void RecordedScene::apply_mode() {
 		restore_tree_pause();
 		set_process_mode(Node::PROCESS_MODE_INHERIT);
 		replay_data.Clear();
-		replay_frame_index = 0;
+		frame_index = -1;
 		replay_loaded = false;
 		return;
 	}
@@ -67,7 +67,7 @@ void RecordedScene::apply_mode() {
 
 void RecordedScene::load_replay() {
 	replay_data.Clear();
-	replay_frame_index = 0;
+	frame_index = -1;
 	replay_loaded = false;
 
 	PackedByteArray bytes = FileAccess::get_file_as_bytes(filename);
@@ -93,10 +93,11 @@ void RecordedScene::restore_tree_pause() {
 }
 
 void RecordedScene::_process(double delta) {
+    frame_index++;
 	if (recording) {
         frame = recording_data.add_frames();
 		capture_frame(Object::cast_to<Node3D>(get_child(0)->get_parent()));
-        save_recording();
+        if (frame_index % 5 == 0) { save_recording(); }
 		return;
 	}
 
@@ -132,11 +133,11 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 }
 
 void RecordedScene::replay_frame() {
-	if (!replay_loaded || replay_frame_index >= replay_data.frames_size()) {
+	if (!replay_loaded || frame_index >= replay_data.frames_size()) {
 		return;
 	}
 
-	const demo::Recording_Frame &frame = replay_data.frames(replay_frame_index++);
+	const demo::Recording_Frame &frame = replay_data.frames(frame_index);
 	int node_index = 0;
 	for (int i = 0; i < frame.nodes_size() && node_index < frame.nodes_size(); i++) {
 		const demo::Recording_Frame_Node3D &node = frame.nodes(node_index++);

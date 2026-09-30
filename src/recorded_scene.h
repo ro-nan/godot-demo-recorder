@@ -29,7 +29,7 @@ private:
 	bool replay_loaded = false;
 	bool restore_pause_on_exit = false;
 	bool tree_was_paused = false;
-	int replay_frame_index = 0;
+	int frame_index = -1;
 	String filename = "rec.bin";
 	demo::Recording recording_data;
 	demo::Recording replay_data;
