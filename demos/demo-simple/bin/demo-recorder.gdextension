@@ -1,7 +1,7 @@
 [configuration]
 
-entry_symbol = "demo_recorder_library_init"
-compatibility_minimum = "4.1"
+entry_symbol = "init_lib"
+compatibility_minimum = "4.6"
 reloadable = true
 
 [libraries]
