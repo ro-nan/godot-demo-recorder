@@ -1,6 +1,9 @@
 demo/.godot
 rebuild.sh
-demo/bin/
+
+*.framework
+*.dll
+*.so
 
 *.os
 *.pb.*
