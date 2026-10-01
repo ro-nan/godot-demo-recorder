@@ -5,24 +5,36 @@ package demo;
 message Recording {
   message Frame {
     float time = 1;
-    message Node3D {
-        string path = 11;
+    message Position {
+      string path = 1;
 
-        float x = 1;
-        float y = 2;
-        float z = 3;
-
-        float rx = 4;
-        float ry = 5;
-        float rz = 6;
-
-        float sx = 7;
-        float sy = 8;
-        float sz = 9;
-
-        bool visible = 10;
+      float x = 2;
+      float y = 3;
+      float z = 4;
     }
-    repeated Node3D nodes = 2;
+    message Rotation {
+      string path = 1;
+
+      float rx = 2;
+      float ry = 3;
+      float rz = 4;
+    }
+    message Scale {
+      string path = 1;
+
+      float sx = 2;
+      float sy = 3;
+      float sz = 4;
+    }
+    message Visibility {
+      string path = 1;
+
+      bool visible = 2;
+    }
+    repeated Position positions = 2;
+    repeated Rotation rotations = 3;
+    repeated Scale scales = 4;
+    repeated Visibility visibilities = 5;
   }
   repeated Frame frames = 1;
 }

@@ -49,7 +49,10 @@ void RecordedScene::apply_mode() {
 		replay_data.Clear();
 		frame_index = -1;
 		replay_loaded = false;
-		previous_nodes.clear();
+		previous_positions.clear();
+		previous_rotations.clear();
+		previous_scales.clear();
+		previous_visibilities.clear();
 		return;
 	}
 
@@ -90,34 +93,87 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 		if (!child) {
 			continue;
 		}
+		
+		auto path = std::string(String(child->get_path().get_concatenated_names()).utf8().get_data()); // NOTE: Maybe make global for this if I keep having to use it? Not sure.
 
         const Vector3 position = child->get_global_position();
+		const bool has_position = child->has_method("get_position");
+
         const Vector3 rotation = child->get_global_rotation();
+		const bool has_rotation = child->has_method("get_rotation");
+
         const Vector3 scale = child->get_scale();
+		const bool has_scale = child->has_method("get_scale");
 
-		demo::Recording_Frame_Node3D current;
-        auto path = std::string(String(child->get_path().get_concatenated_names()).utf8().get_data()); // NOTE: Maybe make global for this if I keep having to use it? Not sure.
-		current.set_path(path);
-		current.set_x(position.x);
-		current.set_y(position.y);
-		current.set_z(position.z);
-		current.set_rx(rotation.x);
-		current.set_ry(rotation.y);
-		current.set_rz(rotation.z);
-		current.set_sx(scale.x);
-		current.set_sy(scale.y);
-		current.set_sz(scale.z);
+		const bool has_visibility = child->has_method("is_visible");
+		
+		if (has_position) {
+			demo::Recording_Frame_Position current_position;
+			current_position.set_path(path);
+			current_position.set_x(position.x);
+			current_position.set_y(position.y);
+			current_position.set_z(position.z);
 
-		auto previous = previous_nodes.find(path);
-		const bool unchanged = previous != previous_nodes.end() &&
-			google::protobuf::util::MessageDifferencer::Equals(previous->second, current);
+			auto prev_p = previous_positions.find(path);
+			const bool p_unchanged = prev_p != previous_positions.end() &&
+				google::protobuf::util::MessageDifferencer::Equals(prev_p->second, current_position);
 
-		if (!unchanged) {
-		    *frame->add_nodes() = current;
-            previous_nodes[path] = current;    
+			if (!p_unchanged) {
+				*frame->add_positions() = current_position;
+				previous_positions[path] = current_position;    
+			}
+		}
+		
+		if (has_rotation) {
+			demo::Recording_Frame_Rotation current_rotation;
+			current_rotation.set_path(path);
+			current_rotation.set_rx(rotation.x);
+			current_rotation.set_ry(rotation.y);
+			current_rotation.set_rz(rotation.z);
+
+			auto prev_r = previous_rotations.find(path);
+			const bool r_unchanged = prev_r != previous_rotations.end() &&
+				google::protobuf::util::MessageDifferencer::Equals(prev_r->second, current_rotation);
+
+			if (!r_unchanged) {
+			    *frame->add_rotations() = current_rotation;
+				previous_rotations[path] = current_rotation;    
+			}
 		}
 
-        capture_frame(child);
+		if (has_scale) {
+			demo::Recording_Frame_Scale current_scale;
+			current_scale.set_path(path);
+			current_scale.set_sx(scale.x);
+			current_scale.set_sy(scale.y);
+			current_scale.set_sz(scale.z);
+
+			auto prev_s = previous_scales.find(path);
+			const bool s_unchanged = prev_s != previous_scales.end() &&
+				google::protobuf::util::MessageDifferencer::Equals(prev_s->second, current_scale);
+
+			if (!s_unchanged) {
+			    *frame->add_scales() = current_scale;
+				previous_scales[path] = current_scale;    
+			}
+		}
+
+		if (has_visibility) {
+			demo::Recording_Frame_Visibility current_visibility;
+			current_visibility.set_path(path);
+			current_visibility.set_visible(child->is_visible());
+
+			auto prev_v = previous_visibilities.find(path);
+			const bool v_unchanged = prev_v != previous_visibilities.end() &&
+				google::protobuf::util::MessageDifferencer::Equals(prev_v->second, current_visibility);
+
+			if (!v_unchanged) {
+			    *frame->add_visibilities() = current_visibility;
+				previous_visibilities[path] = current_visibility;    
+			}
+		}
+
+		capture_frame(child);
 	}
 }
 
@@ -127,21 +183,61 @@ void RecordedScene::replay_frame() {
 	}
 	const demo::Recording_Frame &frame = replay_data.frames(frame_index);
 	int node_index = 0;
-	for (int i = 0; i < frame.nodes_size() && node_index < frame.nodes_size(); i++) {
-		const demo::Recording_Frame_Node3D &node = frame.nodes(node_index++);
+	for (int i = 0; i < frame.positions_size() && node_index < frame.positions_size(); i++) {
+		const demo::Recording_Frame_Position &position = frame.positions(i);
 
-        auto decoded_path = node.path();
+        auto decoded_path = position.path();
         std::string selfname = String(get_name()).utf8().get_data();
         const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
-		//print_line(path);
+
 		Node3D *child = get_node<Node3D>(path);
         if (!child) {
 			continue;
 		}
         
-		child->set_global_position(Vector3(node.x(), node.y(), node.z()));
-        child->set_global_rotation(Vector3(node.rx(), node.ry(), node.rz()));
-        child->set_scale(Vector3(node.sx(), node.sy(), node.sz()));
+		child->set_global_position(Vector3(position.x(), position.y(), position.z()));
+	}
+	for (int i = 0; i < frame.rotations_size() && node_index < frame.rotations_size(); i++) {
+		const demo::Recording_Frame_Rotation &rotation = frame.rotations(i);
+
+		auto decoded_path = rotation.path();
+		std::string selfname = String(get_name()).utf8().get_data();
+		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
+
+		Node3D *child = get_node<Node3D>(path);
+		if (!child) {
+			continue;
+		}
+		
+		child->set_global_rotation(Vector3(rotation.rx(), rotation.ry(), rotation.rz()));
+	}
+	for (int i = 0; i < frame.scales_size() && node_index < frame.scales_size(); i++) {
+		const demo::Recording_Frame_Scale &scale = frame.scales(i);
+
+		auto decoded_path = scale.path();
+		std::string selfname = String(get_name()).utf8().get_data();
+		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
+
+		Node3D *child = get_node<Node3D>(path);
+		if (!child) {
+			continue;
+		}
+		
+		child->set_scale(Vector3(scale.sx(), scale.sy(), scale.sz()));
+	}
+	for (int i = 0; i < frame.visibilities_size() && node_index < frame.visibilities_size(); i++) {
+		const demo::Recording_Frame_Visibility &visibility = frame.visibilities(i);
+
+		auto decoded_path = visibility.path();
+		std::string selfname = String(get_name()).utf8().get_data();
+		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
+
+		Node3D *child = get_node<Node3D>(path);
+		if (!child) {
+			continue;
+		}
+
+		child->set_visible(visibility.visible());
 	}
 }
 

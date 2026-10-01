@@ -36,7 +36,10 @@ private:
 	demo::Recording recording_data;
 	demo::Recording replay_data;
 	demo::Recording_Frame *frame = nullptr;
-	std::unordered_map<std::string, demo::Recording_Frame_Node3D> previous_nodes;
+	std::unordered_map<std::string, demo::Recording_Frame_Position> previous_positions;
+    std::unordered_map<std::string, demo::Recording_Frame_Rotation> previous_rotations;
+    std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
+    std::unordered_map<std::string, demo::Recording_Frame_Visibility> previous_visibilities;
 
 	void apply_mode();
 	void load_replay();
