@@ -46,9 +46,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412659, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Basic FPS Player" unique_id=14701619]
 shape = SubResource("CapsuleShape3D_li7ud")
 
-[node name="_Node3D_20834" parent="Basic FPS Player" unique_id=967683733 instance=ExtResource("2_uri1i")]
-
-[node name="@Node3D@21430" parent="Basic FPS Player" unique_id=522303380 instance=ExtResource("2_uri1i")]
+[node name="CSGBox3D" type="CSGBox3D" parent="Basic FPS Player" unique_id=756876956]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56225586, 0)
+size = Vector3(1, 2.1245117, 1)
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=372930931]
 
