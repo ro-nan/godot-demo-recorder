@@ -1,11 +1,5 @@
 #include "recorded_scene.h"
 
-#include <godot_cpp/classes/file_access.hpp>
-#include <godot_cpp/classes/scene_tree.hpp>
-#include <godot_cpp/core/class_db.hpp>
-#include <google/protobuf/util/message_differencer.h>
-#include <string>
-
 using namespace godot;
 
 void RecordedScene::_bind_methods() {
@@ -50,6 +44,7 @@ void RecordedScene::_exit_tree() {
 
 void RecordedScene::apply_mode() {
 	if (recording) {
+		recording_data.Clear();
 		replay_data.Clear();
 		frame_index = -1;
 		replay_loaded = false;
@@ -91,91 +86,110 @@ void RecordedScene::_process(double delta) {
 	replay_frame();
 }
 
+std::string RecordedScene::get_path(Node* node) {
+	return String(node->get_path().get_concatenated_names()).utf8().get_data();
+}
+
+void RecordedScene::capture_position(Node *child, demo::Recording_Frame *frame) {
+	Node3D *node = Object::cast_to<Node3D>(child);
+	if (!node) {
+		return;
+	}
+
+	const std::string path = get_path(node);
+	const Vector3 position = node->get_global_position();
+	demo::Recording_Frame_Position message;
+	message.set_path(path);
+	message.set_x(position.x);
+	message.set_y(position.y);
+	message.set_z(position.z);
+
+	auto prev_it = previous_positions.find(path);
+	const bool unchanged = prev_it != previous_positions.end() &&
+		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
+	if (!unchanged) {
+		*frame->add_positions() = message;
+		previous_positions[path] = message;
+	}
+}
+
+void RecordedScene::capture_rotation(Node *child, demo::Recording_Frame *frame) {
+	Node3D *node = Object::cast_to<Node3D>(child);
+	if (!node) {
+		return;
+	}
+
+	const std::string path = get_path(node);
+	const Vector3 rotation = node->get_global_rotation();
+	demo::Recording_Frame_Rotation message;
+	message.set_path(path);
+	message.set_rx(rotation.x);
+	message.set_ry(rotation.y);
+	message.set_rz(rotation.z);
+
+	auto prev_it = previous_rotations.find(path);
+	const bool unchanged = prev_it != previous_rotations.end() &&
+		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
+	if (!unchanged) {
+		*frame->add_rotations() = message;
+		previous_rotations[path] = message;
+	}
+}
+
+void RecordedScene::capture_scale(Node *child, demo::Recording_Frame *frame) {
+	Node3D *node = Object::cast_to<Node3D>(child);
+	if (!node) {
+		return;
+	}
+
+	const std::string path = get_path(node);
+	const Vector3 scale = node->get_scale();
+	demo::Recording_Frame_Scale message;
+	message.set_path(path);
+	message.set_sx(scale.x);
+	message.set_sy(scale.y);
+	message.set_sz(scale.z);
+
+	auto prev_it = previous_scales.find(path);
+	const bool unchanged = prev_it != previous_scales.end() &&
+		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
+	if (!unchanged) {
+		*frame->add_scales() = message;
+		previous_scales[path] = message;
+	}
+}
+
+void RecordedScene::capture_visibility(Node *child, demo::Recording_Frame *frame) {
+	Node3D *node = Object::cast_to<Node3D>(child);
+	if (!node) {
+		return;
+	}
+
+	const std::string path = get_path(node);
+	demo::Recording_Frame_Visibility message;
+	message.set_path(path);
+	message.set_visible(node->is_visible());
+
+	auto prev_it = previous_visibilities.find(path);
+	const bool unchanged = prev_it != previous_visibilities.end() &&
+		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
+	if (!unchanged) {
+		*frame->add_visibilities() = message;
+		previous_visibilities[path] = message;
+	}
+}
+
 void RecordedScene::capture_frame(godot::Node3D* parent) {
 	for (int i = 0; i < parent->get_child_count(); i++) {
 		Node3D *child = Object::cast_to<Node3D>(parent->get_child(i));
 		if (!child) {
 			continue;
 		}
-		
-		auto path = std::string(String(child->get_path().get_concatenated_names()).utf8().get_data()); // NOTE: Maybe make global for this if I keep having to use it? Not sure.
 
-        const Vector3 position = child->get_global_position();
-		const bool has_position = child->has_method("get_position");
-
-        const Vector3 rotation = child->get_global_rotation();
-		const bool has_rotation = child->has_method("get_rotation");
-
-        const Vector3 scale = child->get_scale();
-		const bool has_scale = child->has_method("get_scale");
-
-		const bool has_visibility = child->has_method("is_visible");
-		
-		if (has_position) {
-			demo::Recording_Frame_Position current_position;
-			current_position.set_path(path);
-			current_position.set_x(position.x);
-			current_position.set_y(position.y);
-			current_position.set_z(position.z);
-
-			auto prev_p = previous_positions.find(path);
-			const bool p_unchanged = prev_p != previous_positions.end() &&
-				google::protobuf::util::MessageDifferencer::Equals(prev_p->second, current_position);
-
-			if (!p_unchanged) {
-				*frame->add_positions() = current_position;
-				previous_positions[path] = current_position;    
-			}
-		}
-		
-		if (has_rotation) {
-			demo::Recording_Frame_Rotation current_rotation;
-			current_rotation.set_path(path);
-			current_rotation.set_rx(rotation.x);
-			current_rotation.set_ry(rotation.y);
-			current_rotation.set_rz(rotation.z);
-
-			auto prev_r = previous_rotations.find(path);
-			const bool r_unchanged = prev_r != previous_rotations.end() &&
-				google::protobuf::util::MessageDifferencer::Equals(prev_r->second, current_rotation);
-
-			if (!r_unchanged) {
-			    *frame->add_rotations() = current_rotation;
-				previous_rotations[path] = current_rotation;    
-			}
-		}
-
-		if (has_scale) {
-			demo::Recording_Frame_Scale current_scale;
-			current_scale.set_path(path);
-			current_scale.set_sx(scale.x);
-			current_scale.set_sy(scale.y);
-			current_scale.set_sz(scale.z);
-
-			auto prev_s = previous_scales.find(path);
-			const bool s_unchanged = prev_s != previous_scales.end() &&
-				google::protobuf::util::MessageDifferencer::Equals(prev_s->second, current_scale);
-
-			if (!s_unchanged) {
-			    *frame->add_scales() = current_scale;
-				previous_scales[path] = current_scale;    
-			}
-		}
-
-		if (has_visibility) {
-			demo::Recording_Frame_Visibility current_visibility;
-			current_visibility.set_path(path);
-			current_visibility.set_visible(child->is_visible());
-
-			auto prev_v = previous_visibilities.find(path);
-			const bool v_unchanged = prev_v != previous_visibilities.end() &&
-				google::protobuf::util::MessageDifferencer::Equals(prev_v->second, current_visibility);
-
-			if (!v_unchanged) {
-			    *frame->add_visibilities() = current_visibility;
-				previous_visibilities[path] = current_visibility;    
-			}
-		}
+		capture_position(child, frame);
+		capture_rotation(child, frame);
+		capture_scale(child, frame);
+		capture_visibility(child, frame);
 
 		capture_frame(child);
 	}

@@ -5,6 +5,11 @@
 #include "main.pb.h"
 #include <string>
 #include <unordered_map>
+#include <godot_cpp/classes/file_access.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
+#include <godot_cpp/core/class_db.hpp>
+#include <google/protobuf/util/message_differencer.h>
+#include <string>
 
 namespace godot {
 
@@ -28,6 +33,11 @@ public:
     int get_current_frame() const;
     void scrub_to_frame(int p_frame_index);
 
+    std::unordered_map<std::string, demo::Recording_Frame_Position> previous_positions;
+    std::unordered_map<std::string, demo::Recording_Frame_Rotation> previous_rotations;
+    std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
+    std::unordered_map<std::string, demo::Recording_Frame_Visibility> previous_visibilities;
+
 private:
 	bool recording = true;
 	bool initialized = false;
@@ -39,16 +49,18 @@ private:
 	demo::Recording recording_data;
 	demo::Recording replay_data;
 	demo::Recording_Frame *frame = nullptr;
-	std::unordered_map<std::string, demo::Recording_Frame_Position> previous_positions;
-    std::unordered_map<std::string, demo::Recording_Frame_Rotation> previous_rotations;
-    std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
-    std::unordered_map<std::string, demo::Recording_Frame_Visibility> previous_visibilities;
-
+    
 	void apply_mode();
 	void load_replay();
 	void capture_frame(godot::Node3D* parent);
+	void capture_position(Node *child, demo::Recording_Frame *frame);
+	void capture_rotation(Node *child, demo::Recording_Frame *frame);
+	void capture_scale(Node *child, demo::Recording_Frame *frame);
+	void capture_visibility(Node *child, demo::Recording_Frame *frame);
 	void replay_frame();
 	void save_recording();
+
+    std::string get_path(Node* node);
 };
 
 } // namespace godot
