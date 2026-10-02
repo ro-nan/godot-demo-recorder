@@ -12,6 +12,10 @@ void RecordedScene::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_recording", "recording"), &RecordedScene::set_recording);
 	ClassDB::bind_method(D_METHOD("is_recording"), &RecordedScene::is_recording);
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "recording"), "set_recording", "is_recording");
+
+	ClassDB::bind_method(D_METHOD("get_current_frame"), &RecordedScene::get_current_frame);
+	ClassDB::bind_method(D_METHOD("scrub_to_frame", "frame_index"), &RecordedScene::scrub_to_frame);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "current_frame"), "get_current_frame", "scrub_to_frame");
 }
 
 RecordedScene::RecordedScene() = default;
@@ -252,4 +256,32 @@ void RecordedScene::save_recording() {
 	file->store_buffer(reinterpret_cast<const uint8_t *>(data.data()), data.size());
 	file->flush();
 	file->close();
+}
+
+int RecordedScene::get_current_frame() const {
+	return frame_index;
+}
+
+void RecordedScene::scrub_to_frame(int p_frame_index) {
+	if (!replay_loaded || p_frame_index < 0 || p_frame_index >= replay_data.frames_size()) {
+		return;
+	}
+
+	int frame_delta = p_frame_index - frame_index;
+	if (frame_delta == 0) {
+		return;
+	}
+	if (frame_delta > 0) {
+		for (int i = 0; i < frame_delta; i++) {
+			frame_index++;
+			replay_frame();
+		}
+	}
+	else {
+		frame_index = 0;
+		for (int i = 0; i < p_frame_index; i++) {
+			frame_index++;
+			replay_frame();
+		}
+	}
 }

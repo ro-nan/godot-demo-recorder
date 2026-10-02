@@ -25,6 +25,9 @@ public:
 	void set_recording(bool p_recording);
 	bool is_recording() const;
 
+    int get_current_frame() const;
+    void scrub_to_frame(int p_frame_index);
+
 private:
 	bool recording = true;
 	bool initialized = false;
