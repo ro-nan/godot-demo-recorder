@@ -2,6 +2,8 @@
 #define RECORDED_SCENE_H
 
 #include <godot_cpp/classes/node3d.hpp>
+#include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/classes/control.hpp>
 #include "main.pb.h"
 #include <string>
 #include <unordered_map>

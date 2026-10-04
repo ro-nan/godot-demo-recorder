@@ -106,7 +106,7 @@ void RecordedScene::capture_position(Node *child, demo::Recording_Frame *frame) 
 	message.set_path(path);
 	message.set_x(position.x);
 	message.set_y(position.y);
-	message.set_z(position.z);
+	if (node->is_class("Node3D")) { message.set_z(position.z); }
 
 	auto prev_it = previous_positions.find(path);
 	const bool unchanged = prev_it != previous_positions.end() &&
@@ -133,7 +133,7 @@ void RecordedScene::capture_rotation(Node *child, demo::Recording_Frame *frame) 
 	message.set_path(path);
 	message.set_rx(rotation.x);
 	message.set_ry(rotation.y);
-	message.set_rz(rotation.z);
+	if (node->is_class("Node3D")) { message.set_rz(rotation.z); }
 
 	auto prev_it = previous_rotations.find(path);
 	const bool unchanged = prev_it != previous_rotations.end() &&
@@ -160,7 +160,7 @@ void RecordedScene::capture_scale(Node *child, demo::Recording_Frame *frame) {
 	message.set_path(path);
 	message.set_sx(scale.x);
 	message.set_sy(scale.y);
-	message.set_sz(scale.z);
+	if (node->is_class("Node3D")) { message.set_sz(scale.z); }
 
 	auto prev_it = previous_scales.find(path);
 	const bool unchanged = prev_it != previous_scales.end() &&
@@ -225,12 +225,14 @@ void RecordedScene::replay_frame() {
         std::string selfname = String(get_name()).utf8().get_data();
         const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
 
-		Node3D *child = get_node<Node3D>(path);
+		Node *child = get_node<Node>(path);
         if (!child) {
 			continue;
 		}
         
-		child->set_global_position(Vector3(position.x(), position.y(), position.z()));
+		if (child->is_class("Node3D")) { Object::cast_to<Node3D>(child)->set_global_position(Vector3(position.x(), position.y(), position.z())); }
+		if (child->is_class("Node2D")) { Object::cast_to<Node2D>(child)->set_global_position(Vector2(position.x(), position.y())); }
+		if (child->is_class("Control")) { Object::cast_to<Control>(child)->set_global_position(Vector2(position.x(), position.y())); }
 	}
 	for (int i = 0; i < frame.rotations_size() && node_index < frame.rotations_size(); i++) {
 		const demo::Recording_Frame_Rotation &rotation = frame.rotations(i);
@@ -244,7 +246,9 @@ void RecordedScene::replay_frame() {
 			continue;
 		}
 		
-		child->set_global_rotation(Vector3(rotation.rx(), rotation.ry(), rotation.rz()));
+		if (child->is_class("Node3D")) { Object::cast_to<Node3D>(child)->set_global_rotation(Vector3(rotation.rx(), rotation.ry(), rotation.rz())); }
+		if (child->is_class("Node2D")) { Object::cast_to<Node2D>(child)->set_global_rotation(rotation.rz()); }
+		if (child->is_class("Control")) { Object::cast_to<Control>(child)->set_rotation(rotation.rz()); }
 	}
 	for (int i = 0; i < frame.scales_size() && node_index < frame.scales_size(); i++) {
 		const demo::Recording_Frame_Scale &scale = frame.scales(i);
@@ -258,7 +262,9 @@ void RecordedScene::replay_frame() {
 			continue;
 		}
 		
-		child->set_scale(Vector3(scale.sx(), scale.sy(), scale.sz()));
+		if (child->is_class("Node3D")) { Object::cast_to<Node3D>(child)->set_scale(Vector3(scale.sx(), scale.sy(), scale.sz())); }
+		if (child->is_class("Node2D")) { Object::cast_to<Node2D>(child)->set_scale(Vector2(scale.sx(), scale.sy())); }
+		if (child->is_class("Control")) { Object::cast_to<Control>(child)->set_scale(Vector2(scale.sx(), scale.sy())); }
 	}
 	for (int i = 0; i < frame.visibilities_size() && node_index < frame.visibilities_size(); i++) {
 		const demo::Recording_Frame_Visibility &visibility = frame.visibilities(i);
