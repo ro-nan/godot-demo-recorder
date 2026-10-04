@@ -96,6 +96,10 @@ void RecordedScene::capture_position(Node *child, demo::Recording_Frame *frame) 
 		return;
 	}
 
+	if (!node->has_method("get_position")){
+		return;
+	}
+
 	const std::string path = get_path(node);
 	const Vector3 position = node->get_global_position();
 	demo::Recording_Frame_Position message;
@@ -116,6 +120,10 @@ void RecordedScene::capture_position(Node *child, demo::Recording_Frame *frame) 
 void RecordedScene::capture_rotation(Node *child, demo::Recording_Frame *frame) {
 	Node3D *node = Object::cast_to<Node3D>(child);
 	if (!node) {
+		return;
+	}
+
+	if (!node->has_method("get_rotation")){
 		return;
 	}
 
@@ -142,6 +150,10 @@ void RecordedScene::capture_scale(Node *child, demo::Recording_Frame *frame) {
 		return;
 	}
 
+	if (!node->has_method("get_scale")){
+		return;
+	}
+
 	const std::string path = get_path(node);
 	const Vector3 scale = node->get_scale();
 	demo::Recording_Frame_Scale message;
@@ -162,6 +174,10 @@ void RecordedScene::capture_scale(Node *child, demo::Recording_Frame *frame) {
 void RecordedScene::capture_visibility(Node *child, demo::Recording_Frame *frame) {
 	Node3D *node = Object::cast_to<Node3D>(child);
 	if (!node) {
+		return;
+	}
+
+	if (!node->has_method("is_visible")){
 		return;
 	}
 
@@ -190,6 +206,7 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 		capture_rotation(child, frame);
 		capture_scale(child, frame);
 		capture_visibility(child, frame);
+		// TODO: Add more things to capture
 
 		capture_frame(child);
 	}
