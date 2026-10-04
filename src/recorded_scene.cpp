@@ -10,11 +10,23 @@ void RecordedScene::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_current_frame"), &RecordedScene::get_current_frame);
 	ClassDB::bind_method(D_METHOD("scrub_to_frame", "frame_index"), &RecordedScene::scrub_to_frame);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "current_frame"), "get_current_frame", "scrub_to_frame");
+
+	ClassDB::bind_method(D_METHOD("get_recording_filename"), &RecordedScene::get_recording_filename);
+	ClassDB::bind_method(D_METHOD("set_recording_filename", "recording_filename"), &RecordedScene::set_recording_filename);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "recording_filename"), "set_recording_filename", "get_recording_filename");
 }
 
 RecordedScene::RecordedScene() = default;
 
 RecordedScene::~RecordedScene() = default;
+
+String RecordedScene::get_recording_filename() const {
+	return filename;
+}
+
+void RecordedScene::set_recording_filename(String recording_filename) {
+	filename = recording_filename;
+}
 
 void RecordedScene::set_recording(bool p_recording) {
 	if (recording == p_recording) {

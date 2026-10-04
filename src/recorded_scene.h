@@ -35,6 +35,9 @@ public:
     int get_current_frame() const;
     void scrub_to_frame(int p_frame_index);
 
+	String get_recording_filename() const;
+	void set_recording_filename(String recording_filename);
+
     std::unordered_map<std::string, demo::Recording_Frame_Position> previous_positions;
     std::unordered_map<std::string, demo::Recording_Frame_Rotation> previous_rotations;
     std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
@@ -47,7 +50,7 @@ private:
 	bool restore_pause_on_exit = false;
 	bool tree_was_paused = false;
 	int frame_index = -1;
-	String filename = "rec.bin";
+	String filename = "rec.dem";
 	demo::Recording recording_data;
 	demo::Recording replay_data;
 	demo::Recording_Frame *frame = nullptr;
