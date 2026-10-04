@@ -38,6 +38,9 @@ public:
 	String get_recording_filename() const;
 	void set_recording_filename(String recording_filename);
 
+	int get_total_frames() const;
+	double get_total_time() const;
+
     std::unordered_map<std::string, demo::Recording_Frame_Position> previous_positions;
     std::unordered_map<std::string, demo::Recording_Frame_Rotation> previous_rotations;
     std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
@@ -65,7 +68,7 @@ private:
 	void capture_rotation(Node *child, demo::Recording_Frame *frame);
 	void capture_scale(Node *child, demo::Recording_Frame *frame);
 	void capture_visibility(Node *child, demo::Recording_Frame *frame);
-	void replay_frame();
+	void replay_frame(bool increment_frame_index = true);
 	void save_recording();
 
     std::string get_path(Node* node);

@@ -14,6 +14,11 @@ void RecordedScene::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_recording_filename"), &RecordedScene::get_recording_filename);
 	ClassDB::bind_method(D_METHOD("set_recording_filename", "recording_filename"), &RecordedScene::set_recording_filename);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "recording_filename"), "set_recording_filename", "get_recording_filename");
+
+	ClassDB::bind_method(D_METHOD("get_total_frames"), &RecordedScene::get_total_frames);
+	ClassDB::bind_method(D_METHOD("get_total_time"), &RecordedScene::get_total_time);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "total_frames"), "get_total_frames", "get_total_time");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "total_time"), "get_total_time", "get_total_frames");
 }
 
 RecordedScene::RecordedScene() = default;
@@ -26,6 +31,17 @@ String RecordedScene::get_recording_filename() const {
 
 void RecordedScene::set_recording_filename(String recording_filename) {
 	filename = recording_filename;
+}
+
+int RecordedScene::get_total_frames() const {
+	return replay_data.frames_size();
+}
+
+double RecordedScene::get_total_time() const {
+	if (replay_data.frames_size() == 0) {
+		return 0.0;
+	}
+	return replay_data.frames(replay_data.frames_size() - 1).time();
 }
 
 void RecordedScene::set_recording(bool p_recording) {
@@ -226,7 +242,7 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 	}
 }
 
-void RecordedScene::replay_frame() {
+void RecordedScene::replay_frame(bool increment_frame_index) {
 	if (!replay_loaded || current_replay_frame_index >= replay_data.frames_size()) {
 		return;
 	}
@@ -297,7 +313,7 @@ void RecordedScene::replay_frame() {
 
 		child->set_visible(visibility.visible());
 	}
-	current_replay_frame_index++;
+	if (increment_frame_index) { current_replay_frame_index++; }
 }
 
 void RecordedScene::save_recording() {
@@ -329,14 +345,16 @@ void RecordedScene::scrub_to_frame(int p_frame_index) {
 	if (frame_delta > 0) {
 		for (int i = 0; i < frame_delta; i++) {
 			current_replay_frame_index++;
-			replay_frame();
+			replay_frame(false);
 		}
+		current_time = replay_data.frames(current_replay_frame_index).time();
 	}
 	else {
-		frame_index = 0;
+		current_replay_frame_index = 0;
 		for (int i = 0; i < p_frame_index; i++) {
 			current_replay_frame_index++;
-			replay_frame();
+			replay_frame(false);
 		}
+		current_time = replay_data.frames(current_replay_frame_index).time();
 	}
 }

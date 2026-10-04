@@ -30,6 +30,10 @@ func _physics_process(delta):
 
 ```
 
+Pause the recording using `RecordedScene.process_mode = Node.PROCESS_MODE_PAUSED` and unpause it using `main.process_mode = Node.PROCESS_MODE_INHERIT`.
+
+Scrub thru the recording using `main.scrub_to_frame(int)`
+
 ## Advantages
 - No external software needed
 - Can any session any time
