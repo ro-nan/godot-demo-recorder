@@ -88,8 +88,10 @@ void RecordedScene::load_replay() {
 
 void RecordedScene::_process(double delta) {
     frame_index++;
+	current_time += delta;
 	if (recording) {
         frame = recording_data.add_frames();
+		frame->set_time(current_time);
 		capture_frame(this);
         if (frame_index % 5 == 0) { save_recording(); }
 		return;
@@ -225,10 +227,13 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 }
 
 void RecordedScene::replay_frame() {
-	if (!replay_loaded || frame_index >= replay_data.frames_size()) {
+	if (!replay_loaded || current_replay_frame_index >= replay_data.frames_size()) {
 		return;
 	}
-	const demo::Recording_Frame &frame = replay_data.frames(frame_index);
+	if (current_time < replay_data.frames(current_replay_frame_index + 1).time()) {
+		return;
+	}
+	const demo::Recording_Frame &frame = replay_data.frames(current_replay_frame_index);
 	int node_index = 0;
 	for (int i = 0; i < frame.positions_size() && node_index < frame.positions_size(); i++) {
 		const demo::Recording_Frame_Position &position = frame.positions(i);
@@ -292,6 +297,7 @@ void RecordedScene::replay_frame() {
 
 		child->set_visible(visibility.visible());
 	}
+	current_replay_frame_index++;
 }
 
 void RecordedScene::save_recording() {
@@ -308,7 +314,7 @@ void RecordedScene::save_recording() {
 }
 
 int RecordedScene::get_current_frame() const {
-	return frame_index;
+	return current_replay_frame_index;
 }
 
 void RecordedScene::scrub_to_frame(int p_frame_index) {
@@ -316,7 +322,7 @@ void RecordedScene::scrub_to_frame(int p_frame_index) {
 		return;
 	}
 
-	int frame_delta = p_frame_index - frame_index;
+	int frame_delta = p_frame_index - current_replay_frame_index;
 	if (frame_delta == 0) {
 		return;
 	}

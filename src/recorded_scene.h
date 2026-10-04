@@ -50,6 +50,8 @@ private:
 	bool restore_pause_on_exit = false;
 	bool tree_was_paused = false;
 	int frame_index = -1;
+	double current_time = 0.0;
+	int current_replay_frame_index = 0;
 	String filename = "rec.dem";
 	demo::Recording recording_data;
 	demo::Recording replay_data;
