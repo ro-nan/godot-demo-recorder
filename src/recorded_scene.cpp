@@ -328,14 +328,14 @@ void RecordedScene::scrub_to_frame(int p_frame_index) {
 	}
 	if (frame_delta > 0) {
 		for (int i = 0; i < frame_delta; i++) {
-			frame_index++;
+			current_replay_frame_index++;
 			replay_frame();
 		}
 	}
 	else {
 		frame_index = 0;
 		for (int i = 0; i < p_frame_index; i++) {
-			frame_index++;
+			current_replay_frame_index++;
 			replay_frame();
 		}
 	}

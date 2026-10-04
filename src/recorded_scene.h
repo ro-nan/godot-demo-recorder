@@ -56,6 +56,7 @@ private:
 	demo::Recording recording_data;
 	demo::Recording replay_data;
 	demo::Recording_Frame *frame = nullptr;
+	demo::Recording scrub_frame_cache;
     
 	void apply_mode();
 	void load_replay();
