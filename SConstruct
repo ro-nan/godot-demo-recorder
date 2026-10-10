@@ -16,8 +16,17 @@ build_path = os.path.abspath(paths[0])
 
 env = SConscript("godot-cpp/SConstruct", {"api_version": "4.6"})
 
+for key in ("CC", "CXX", "AR", "AS", "RANLIB", "STRIP", "LINK"):
+    value = os.environ.get(key)
+    if value:
+        env[key] = value
+
 # Adjust this if your source files live in a different folder.
 env.Append(CPPPATH=["src/"])
+if os.environ.get("PROTOBUF_INCLUDE_DIR"):
+    env.Append(CPPPATH=[os.environ["PROTOBUF_INCLUDE_DIR"]])
+if os.environ.get("PROTOBUF_LIB_DIR"):
+    env.Append(LIBPATH=[os.environ["PROTOBUF_LIB_DIR"]])
 env.Append(LIBS=["protobuf"])
 sources = Glob("src/*.cpp") + Glob("src/*.cc", strings=True)
 
@@ -36,12 +45,12 @@ def build_library_path():
             return os.path.join(
                 build_path,
                 "bin",
-                "libdemo-recorder.{}.{}.simulator.a".format(env["platform"], env["target"]),
+                "libdemo-recorder.{}.{}.universal.simulator.a".format(env["platform"], env["target"]),
             )
         return os.path.join(
             build_path,
             "bin",
-            "libdemo-recorder.{}.{}.a".format(env["platform"], env["target"]),
+            "libdemo-recorder.{}.{}.arm64.a".format(env["platform"], env["target"]),
         )
     return os.path.join(
         build_path,
