@@ -7,6 +7,7 @@
 #include "main.pb.h"
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -46,6 +47,8 @@ public:
     std::unordered_map<std::string, demo::Recording_Frame_Scale> previous_scales;
     std::unordered_map<std::string, demo::Recording_Frame_Visibility> previous_visibilities;
 
+	bool capture_full = false;
+
 private:
 	bool recording = true;
 	bool initialized = false;
@@ -60,6 +63,7 @@ private:
 	demo::Recording replay_data;
 	demo::Recording_Frame *frame = nullptr;
 	demo::Recording scrub_frame_cache;
+	std::vector<int> scrub_frame_source_indices;
     
 	void apply_mode();
 	void load_replay();
@@ -68,7 +72,7 @@ private:
 	void capture_rotation(Node *child, demo::Recording_Frame *frame);
 	void capture_scale(Node *child, demo::Recording_Frame *frame);
 	void capture_visibility(Node *child, demo::Recording_Frame *frame);
-	void replay_frame(bool increment_frame_index = true);
+	void replay_frame(int p_frame_index, const demo::Recording *p_replay_data = nullptr);
 	void save_recording();
 
     std::string get_path(Node* node);

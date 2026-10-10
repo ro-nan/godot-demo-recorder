@@ -75,7 +75,11 @@ void RecordedScene::apply_mode() {
 		recording_data.Clear();
 		replay_data.Clear();
 		frame_index = -1;
+		current_time = 0.0;
+		current_replay_frame_index = -1;
 		replay_loaded = false;
+		scrub_frame_cache.Clear();
+		scrub_frame_source_indices.clear();
 		previous_positions.clear();
 		previous_rotations.clear();
 		previous_scales.clear();
@@ -90,7 +94,11 @@ void RecordedScene::apply_mode() {
 void RecordedScene::load_replay() {
 	replay_data.Clear();
 	frame_index = -1;
+	current_time = 0.0;
+	current_replay_frame_index = -1;
 	replay_loaded = false;
+	scrub_frame_cache.Clear();
+	scrub_frame_source_indices.clear();
 
 	PackedByteArray bytes = FileAccess::get_file_as_bytes(filename);
 	if (bytes.is_empty() || !replay_data.ParseFromArray(bytes.ptr(), bytes.size())) {
@@ -106,6 +114,7 @@ void RecordedScene::_process(double delta) {
     frame_index++;
 	current_time += delta;
 	if (recording) {
+		capture_full = false;
         frame = recording_data.add_frames();
 		frame->set_time(current_time);
 		capture_frame(this);
@@ -113,7 +122,14 @@ void RecordedScene::_process(double delta) {
 		return;
 	}
 
-	replay_frame();
+	if (!replay_loaded) {
+		return;
+	}
+	while (current_replay_frame_index + 1 < replay_data.frames_size() &&
+		current_time >= replay_data.frames(current_replay_frame_index + 1).time()) {
+		current_replay_frame_index++;
+		replay_frame(current_replay_frame_index, &replay_data);
+	}
 }
 
 std::string RecordedScene::get_path(Node* node) {
@@ -141,7 +157,7 @@ void RecordedScene::capture_position(Node *child, demo::Recording_Frame *frame) 
 	auto prev_it = previous_positions.find(path);
 	const bool unchanged = prev_it != previous_positions.end() &&
 		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
-	if (!unchanged) {
+	if (!unchanged || capture_full) {
 		*frame->add_positions() = message;
 		previous_positions[path] = message;
 	}
@@ -168,7 +184,7 @@ void RecordedScene::capture_rotation(Node *child, demo::Recording_Frame *frame) 
 	auto prev_it = previous_rotations.find(path);
 	const bool unchanged = prev_it != previous_rotations.end() &&
 		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
-	if (!unchanged) {
+	if (!unchanged || capture_full) {
 		*frame->add_rotations() = message;
 		previous_rotations[path] = message;
 	}
@@ -195,7 +211,7 @@ void RecordedScene::capture_scale(Node *child, demo::Recording_Frame *frame) {
 	auto prev_it = previous_scales.find(path);
 	const bool unchanged = prev_it != previous_scales.end() &&
 		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
-	if (!unchanged) {
+	if (!unchanged || capture_full) {
 		*frame->add_scales() = message;
 		previous_scales[path] = message;
 	}
@@ -219,7 +235,7 @@ void RecordedScene::capture_visibility(Node *child, demo::Recording_Frame *frame
 	auto prev_it = previous_visibilities.find(path);
 	const bool unchanged = prev_it != previous_visibilities.end() &&
 		google::protobuf::util::MessageDifferencer::Equals(prev_it->second, message);
-	if (!unchanged) {
+	if (!unchanged || capture_full) {
 		*frame->add_visibilities() = message;
 		previous_visibilities[path] = message;
 	}
@@ -242,14 +258,12 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 	}
 }
 
-void RecordedScene::replay_frame(bool increment_frame_index) {
-	if (!replay_loaded || current_replay_frame_index >= replay_data.frames_size()) {
+	void RecordedScene::replay_frame(int p_frame_index, const demo::Recording *p_replay_data) {
+	const demo::Recording &data = p_replay_data ? *p_replay_data : replay_data;
+	if (p_frame_index < 0 || p_frame_index >= data.frames_size()) {
 		return;
 	}
-	if (current_time < replay_data.frames(current_replay_frame_index + 1).time()) {
-		return;
-	}
-	const demo::Recording_Frame &frame = replay_data.frames(current_replay_frame_index);
+	const demo::Recording_Frame &frame = data.frames(p_frame_index);
 	int node_index = 0;
 	for (int i = 0; i < frame.positions_size() && node_index < frame.positions_size(); i++) {
 		const demo::Recording_Frame_Position &position = frame.positions(i);
@@ -313,7 +327,6 @@ void RecordedScene::replay_frame(bool increment_frame_index) {
 
 		child->set_visible(visibility.visible());
 	}
-	if (increment_frame_index) { current_replay_frame_index++; }
 }
 
 void RecordedScene::save_recording() {
@@ -338,23 +351,43 @@ void RecordedScene::scrub_to_frame(int p_frame_index) {
 		return;
 	}
 
-	int frame_delta = p_frame_index - current_replay_frame_index;
-	if (frame_delta == 0) {
-		return;
-	}
-	if (frame_delta > 0) {
-		for (int i = 0; i < frame_delta; i++) {
-			current_replay_frame_index++;
-			replay_frame(false);
+	auto cache_current_state = [this](int source_frame_index) {
+		capture_full = true;
+		frame = scrub_frame_cache.add_frames();
+		frame->set_time(replay_data.frames(source_frame_index).time());
+		capture_frame(this);
+		capture_full = false;
+		scrub_frame_source_indices.push_back(source_frame_index);
+	};
+
+	int cache_index = -1;
+	for (int i = 0; i < static_cast<int>(scrub_frame_source_indices.size()); i++) {
+		if (scrub_frame_source_indices[i] <= p_frame_index) {
+			cache_index = i;
+		} else {
+			break;
 		}
-		current_time = replay_data.frames(current_replay_frame_index).time();
 	}
-	else {
-		current_replay_frame_index = 0;
-		for (int i = 0; i < p_frame_index; i++) {
-			current_replay_frame_index++;
-			replay_frame(false);
+
+	int next_source_frame = 0;
+	if (cache_index >= 0) {
+		replay_frame(cache_index, &scrub_frame_cache);
+		next_source_frame = scrub_frame_source_indices[cache_index] + 1;
+	} else {
+		replay_frame(0, &replay_data);
+		cache_current_state(0);
+		next_source_frame = 1;
+	}
+
+	for (int source_frame = next_source_frame; source_frame <= p_frame_index; source_frame++) {
+		replay_frame(source_frame, &replay_data);
+		if (source_frame % 30 == 0 &&
+			(source_frame >= static_cast<int>(scrub_frame_source_indices.size()) ||
+				scrub_frame_source_indices[source_frame / 30] != source_frame)) {
+			cache_current_state(source_frame);
 		}
-		current_time = replay_data.frames(current_replay_frame_index).time();
 	}
+
+	current_replay_frame_index = p_frame_index;
+	current_time = replay_data.frames(p_frame_index).time();
 }
