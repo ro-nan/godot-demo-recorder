@@ -1,6 +1,7 @@
 #include "register_types.h"
 
 #include "recorded_scene.h"
+#include "recorded_signal.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -14,6 +15,7 @@ void init_module(ModuleInitializationLevel p_level) {
     }
 
     GDREGISTER_RUNTIME_CLASS(RecordedScene);
+    GDREGISTER_RUNTIME_CLASS(RecordedSignal);
 }
 
 void uninit_module(ModuleInitializationLevel p_level) {

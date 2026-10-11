@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://vupfism0y8ub"]
 
 [ext_resource type="Script" uid="uid://c5cj22osck0xx" path="res://main.gd" id="1_1juj6"]
-[ext_resource type="Script" uid="uid://by4c7vpqujm2m" path="res://addons/Basic FPS Player/Src/basic_player_startup.gd" id="1_fpauf"]
-[ext_resource type="PackedScene" uid="uid://kmyakts4l64t" path="res://addons/Basic FPS Player/Src/basic_player_head.tscn" id="2_uri1i"]
+[ext_resource type="Script" uid="uid://by4c7vpqujm2m" path="res://addons/Basic FPS Player/basic_player_startup.gd" id="1_fpauf"]
+[ext_resource type="PackedScene" uid="uid://kmyakts4l64t" path="res://addons/Basic FPS Player/basic_player_head.tscn" id="2_uri1i"]
 [ext_resource type="Script" uid="uid://cfyg2h42odnqv" path="res://resetter.gd" id="4_1r4tq"]
 [ext_resource type="Script" uid="uid://ldbrrexhtive" path="res://scrubber.gd" id="5_0igtl"]
 

@@ -14,9 +14,13 @@ config/name="dem"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+RecordedSignalBuffer="*uid://c1hf2tww2qdbh"
+
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Basic FPS Player/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 
