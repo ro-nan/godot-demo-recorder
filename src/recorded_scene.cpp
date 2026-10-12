@@ -19,6 +19,8 @@ void RecordedScene::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_total_time"), &RecordedScene::get_total_time);
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "total_frames"), "get_total_frames", "get_total_time");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "total_time"), "get_total_time", "get_total_frames");
+
+	ClassDB::bind_method(D_METHOD("record_function", "name", "owner", "args"), &RecordedScene::capture_function);
 }
 
 RecordedScene::RecordedScene() = default;
@@ -72,6 +74,7 @@ void RecordedScene::_exit_tree() {
 
 void RecordedScene::apply_mode() {
 	if (recording) {
+		frame = nullptr;
 		recording_data.Clear();
 		replay_data.Clear();
 		frame_index = -1;
@@ -241,6 +244,36 @@ void RecordedScene::capture_visibility(Node *child, demo::Recording_Frame *frame
 	}
 }
 
+void RecordedScene::capture_function(StringName name, NodePath owner, Array args) {
+	if (!recording) {
+		return;
+	}
+
+	const bool created_frame = frame == nullptr;
+	if (created_frame) {
+		frame = recording_data.add_frames();
+		frame->set_time(current_time);
+	}
+
+	demo::Recording_Frame_Function* function = frame->add_functions();
+	const CharString utf8_name = String(name).utf8();
+	function->set_name(utf8_name.get_data());
+	const CharString utf8_owner = String(owner).utf8();
+	function->set_owner_path(utf8_owner.get_data());
+	for (int i = 0; i < args.size(); i++) {
+		const Variant &arg = args[i];
+		if (arg.get_type() == Variant::STRING) {
+			const CharString utf8_value = String(arg).utf8();
+			function->add_args(utf8_value.get_data());
+		} else {
+			print_error("RecordedScene: function argument is not a string");
+		}
+	}
+	if (created_frame) {
+		frame = nullptr;
+	}
+}
+
 void RecordedScene::capture_frame(godot::Node3D* parent) {
 	for (int i = 0; i < parent->get_child_count(); i++) {
 		Node3D *child = Object::cast_to<Node3D>(parent->get_child(i));
@@ -258,7 +291,7 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 	}
 }
 
-	void RecordedScene::replay_frame(int p_frame_index, const demo::Recording *p_replay_data) {
+void RecordedScene::replay_frame(int p_frame_index, const demo::Recording *p_replay_data) {
 	const demo::Recording &data = p_replay_data ? *p_replay_data : replay_data;
 	if (p_frame_index < 0 || p_frame_index >= data.frames_size()) {
 		return;
@@ -288,7 +321,7 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 		std::string selfname = String(get_name()).utf8().get_data();
 		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
 
-		Node3D *child = get_node<Node3D>(path);
+		Node *child = get_node<Node>(path);
 		if (!child) {
 			continue;
 		}
@@ -304,7 +337,7 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 		std::string selfname = String(get_name()).utf8().get_data();
 		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
 
-		Node3D *child = get_node<Node3D>(path);
+		Node *child = get_node<Node>(path);
 		if (!child) {
 			continue;
 		}
@@ -320,12 +353,32 @@ void RecordedScene::capture_frame(godot::Node3D* parent) {
 		std::string selfname = String(get_name()).utf8().get_data();
 		const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
 
-		Node3D *child = get_node<Node3D>(path);
+		Node *child = get_node<Node>(path);
 		if (!child) {
 			continue;
 		}
 
-		child->set_visible(visibility.visible());
+		if (child->is_class("Node3D")) { Object::cast_to<Node3D>(child)->set_visible(visibility.visible()); }
+		if (child->is_class("Node2D")) { Object::cast_to<Node2D>(child)->set_visible(visibility.visible()); }
+		if (child->is_class("Control")) { Object::cast_to<Control>(child)->set_visible(visibility.visible()); }
+	}
+	for (int i = 0; i < frame.functions_size() && node_index < frame.functions_size(); i++) {
+		const demo::Recording_Frame_Function &function = frame.functions(i);
+
+		auto decoded_path = function.owner_path();
+        std::string selfname = String(get_name()).utf8().get_data();
+        const godot::NodePath path = NodePath(decoded_path.substr(decoded_path.find(selfname) + selfname.length() + 1).c_str());
+		auto child = get_node<Node>(path);
+
+		if (!child) {
+			continue;
+		}
+
+		Array call_args;
+		for (const std::string &arg : function.args()) {
+			call_args.append(String::utf8(arg.c_str()));
+		}
+		child->callv(StringName(function.name().c_str()), call_args);
 	}
 }
 

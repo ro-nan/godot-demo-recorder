@@ -33,12 +33,11 @@ void RecordedSignal::callback(const Variant **p_args, GDExtensionInt p_argcount,
 	}
 
 	if (owner == nullptr) {
-		print_line("CALLBACK! on ", name, " with no owner");
+		print_line("Callback on ", name, " with no owner");
 		r_error.error = GDEXTENSION_CALL_OK;
 		return;
 	}
-
-	print_line("CALLBACK! on ", name, " args=", args);
+	
 	owner->call("callback", name, args);
 	r_error.error = GDEXTENSION_CALL_OK;
 }

@@ -31,10 +31,16 @@ message Recording {
 
       bool visible = 2;
     }
+    message Function {
+      string name = 1;
+      string owner_path = 2;
+      repeated string args = 3;
+    }
     repeated Position positions = 2;
     repeated Rotation rotations = 3;
     repeated Scale scales = 4;
     repeated Visibility visibilities = 5;
+    repeated Function functions = 6;
   }
   repeated Frame frames = 1;
 }

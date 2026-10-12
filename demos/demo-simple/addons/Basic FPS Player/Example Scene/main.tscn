@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://kmyakts4l64t" path="res://addons/Basic FPS Player/basic_player_head.tscn" id="2_uri1i"]
 [ext_resource type="Script" uid="uid://cfyg2h42odnqv" path="res://resetter.gd" id="4_1r4tq"]
 [ext_resource type="Script" uid="uid://ldbrrexhtive" path="res://scrubber.gd" id="5_0igtl"]
+[ext_resource type="Script" uid="uid://m5agoo0s1xlr" path="res://function_caller.gd" id="5_y6yk4"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_li7ud"]
 
@@ -84,6 +85,9 @@ environment = SubResource("Environment_4mccc")
 
 [node name="Resetter" type="Node3D" parent="main" unique_id=1218840971]
 script = ExtResource("4_1r4tq")
+
+[node name="FunctionCaller" type="Node3D" parent="main" unique_id=759821464]
+script = ExtResource("5_y6yk4")
 
 [node name="Control" type="Control" parent="." unique_id=1131316760]
 layout_mode = 3
